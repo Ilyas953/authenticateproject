@@ -116,7 +116,7 @@ function Creation({ suite, setSuite }) {
               <img src={imagetab[counter]} className='w-20 h-20 rounded-full border-2 border-white' alt='profil possible' />
               <button onClick={() => setCounter(prev => prev === 2 ? 0 : prev + 1)} className='text-xl' type='button'><FaArrowRight /></button>
               <ReCAPTCHA 
-                sitekey='6LcKXk4rAAAAAEgicpS2T8kDL0h25a_eoNdJnfPk'
+                sitekey='6Lcnek4rAAAAAGXQRcqpF0z9GpBHu1gO-V2k-rUL'
                 onChange={() => setCaptchaValid(true)}
                 theme='dark'
                 
