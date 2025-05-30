@@ -53,8 +53,9 @@ import { useState, useEffect } from "react"
     setActualuser(prev => ({...prev, [prop]: newValue}))
   }
 
-  function deleteUser(key) {
-    setTabuser(prev => prev.filter(u => u.key !== key))
+  function deleteUser() {
+    setTabuser(prev => prev.filter(u => u.key !== actualuser.key))
+    setActualuser(null)
     
   }
 

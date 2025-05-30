@@ -34,7 +34,6 @@ function Creation({ suite, setSuite }) {
   const { tabuser, createUser } = useContext(usercontext)
   const [counter, setCounter] = useState(0)
   const [ready, setReady] = useState(false)
-  const [captchaValid, setCaptchaValid] = useState(false)
   const {rendercond, setRendercond} = useContext(rendercontext)
   
 
@@ -44,7 +43,7 @@ function Creation({ suite, setSuite }) {
     setSuite(0)
     setCounter(0)
     setReady(false)
-    setCaptchaValid(false)
+    
   },[rendercond])
 
 
@@ -115,12 +114,7 @@ function Creation({ suite, setSuite }) {
               <button onClick={() => setCounter(prev => prev === 0 ? 2 : prev - 1)} className='text-xl' type='button'><FaArrowLeft /></button>
               <img src={imagetab[counter]} className='w-20 h-20 rounded-full border-2 border-white' alt='profil possible' />
               <button onClick={() => setCounter(prev => prev === 2 ? 0 : prev + 1)} className='text-xl' type='button'><FaArrowRight /></button>
-              <ReCAPTCHA 
-                sitekey='6Lcnek4rAAAAAGXQRcqpF0z9GpBHu1gO-V2k-rUL'
-                onChange={() => setCaptchaValid(true)}
-                theme='dark'
-                
-            />
+              
             </div>
             
             <button
@@ -130,7 +124,7 @@ function Creation({ suite, setSuite }) {
             >
               Choisir cette image
             </button>
-          <button type='submit' className={`px-4 py-2 rounded text-white ${ready && captchaValid ? 'bg-blue-500' : 'bg-blue-950 opacity-35'}`}>Tout valider</button>
+          <button type='submit' className={`px-4 py-2 rounded text-white ${ready ? 'bg-blue-500' : 'bg-blue-950 opacity-35'}`}>Tout valider</button>
           </div>
         )
       default:
@@ -186,15 +180,23 @@ function Userinfo() {
   return (
     <>
       {actualuser && (
-        <div className='text-center space-y-2'>
-          <p className='text-xl font-bold'>{actualuser.name}</p>
-          <img src={actualuser.picture} alt='photo de profil' className='w-24 h-24 rounded-full mx-auto' />
-          <button onClick={() => connexion('deconnexion')} className='bg-red-600 px-4 py-2 rounded text-white'>Se déconnecter</button>
+        <div className='flex items-center gap-4 text-white justify-end'>
+          
+          <img
+            src={actualuser.picture}
+            alt='photo de profil'
+            className='w-24 h-24 rounded-full border border-white'
+          />
+        
+          <div>
+            <p className='text-xl font-bold'>{actualuser.name}</p>
+          </div>
         </div>
       )}
     </>
   )
 }
+
 
 function Blocshow({name, id, picture}) {
   const {deleteUser, tabuser} = useContext(usercontext)
@@ -218,27 +220,80 @@ function Blocshow({name, id, picture}) {
   )
 }
 
-function Show() {
-  const {tabuser} = useContext(usercontext)
 
-  return (
-    <>
-    {tabuser.map(u => (
-      <Blocshow key={u.key} name={u.name} id={u.key} picture={u.picture} />
-    ))}
-    </>
-  )
+
+function Profile() {
+const {actualuser, deleteUser, connexion} = useContext(usercontext)
+const {setRendercond} = useContext(usercontext)
+
+if (!actualuser) {
+  return null
 }
+
+return(
+  <>
+    <div className='flex flex-col my-50 mx-80'>
+      <div className='flex flex-col'>
+      <img src={actualuser.picture} className='w-30 h-30 rounded-full' />
+      <p className='font-bold text-lg mx-10 my-5'>{actualuser.name}</p>
+      </div>
+      <div className='flex -mx-25'>
+      <button onClick={() => { connexion('deconnexion'); setRendercond('')}} className='bg-red-400 m-4 w-33 h-12 border-black shadow-2xs rounded '>se deconnecter</button>
+      <button onClick={() => {deleteUser(); setRendercond('')}} className='bg-red-500 m-4 w-33 h-12 rounded'>supprimer le compte</button>
+      </div>
+    </div>
+
+
+</>)
+
+
+
+}
+
+function Affichage() {
+const {actualuser} = useContext(usercontext)
+const {rendercond, setRendercond, isrendering} = useContext(rendercontext)
+
+function renderage() {
+  if (!actualuser) {
+    return (
+      <>
+       <button onClick={() => setRendercond(['creation'])} className='bg-yellow-600 px-4 py-2 rounded text-white'>S'inscrire</button>
+      <button onClick={() => setRendercond(['login'])} className='bg-teal-600 px-4 py-2 rounded text-white'>Se connecter</button>
+      </>
+    )
+  }
+
+  if (actualuser) {
+    return (
+      <>
+      <button onClick={() => setRendercond(['profil'])} className='bg-blue-400 px-4 py-2 rounded text-white'>Profil</button>
+      </>
+    )
+  }
+}
+
+
+return (
+  <>
+  {renderage()}
+  </>
+)
+
+}
+
 
 function App() {
   const user = useUser()
   const [rendercond, setRendercond] = useState([])
   const [suite, setSuite] = useState(0)
+  
 
   function isrendering(toggle) {
     return rendercond.includes(toggle)
   }
 
+  
  
 
   return (
@@ -247,15 +302,13 @@ function App() {
         <div className='bg-gray-800 min-h-screen w-full text-white p-10'>
           <div className='max-w-3xl mx-auto space-y-6'>
             <Userinfo />
-            <div className='flex gap-4 justify-center'>
-              <button onClick={() => setRendercond(['creation'])} className='bg-yellow-600 px-4 py-2 rounded text-white'>S'inscrire</button>
-              <button onClick={() => setRendercond(['login'])} className='bg-teal-600 px-4 py-2 rounded text-white'>Se connecter</button>
-              <button onClick={() => setRendercond(['show'])} className='bg-red-800 px-4 py-2 rounded text-white'>voir les comptes crees</button>
-
+              <div className='flex gap-4 justify-center'>
+              <Affichage />
             </div>
             {isrendering('creation') && <Creation suite={suite} setSuite={setSuite} />}
             {isrendering('login') && <Login />}
             {isrendering('show') && <Show />}
+            {isrendering('profil') && <Profile />}
           </div>
         </div>
       </rendercontext.Provider>
