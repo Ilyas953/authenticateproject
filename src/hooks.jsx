@@ -45,15 +45,20 @@ export function useUser(initial = []) {
   }, [actualuser])
 
   // Ajouter un utilisateur
-  function createUser(user) {
-    const newuser = { ...user, key: Date.now() }
+  async function createUser(user) {
+  const newuser = { ...user, key: Date.now() }
+  console.log("Nouvel utilisateur :", newuser)
+
+  const { data, error } = await supabase.from('users').insert([newuser])
+
+  if (error) {
+    console.error('Erreur création utilisateur', error.message, error.details, error)
+    return false
+  } else {
     setTabuser(prev => [...prev, newuser])
-
-    supabase.from('users').insert(newuser).catch(err =>
-      console.error('Erreur création utilisateur', err)
-    )
+    return true
   }
-
+}
   // Connexion / déconnexion
   function connexion(type, name, pass) {
     if (type === 'deconnexion') {

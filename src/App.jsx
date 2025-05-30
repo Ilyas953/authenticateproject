@@ -10,7 +10,7 @@ import { usercontext } from './usercontext'
 import { rendercontext } from './usercontext'
 import { useUser } from './hooks'
 import { naruto, onePiece, bleach, dragonballz, attaqueDesTitans } from './donnees'
-import ReCAPTCHA from 'react-google-recaptcha'
+
 
 const imagetab = [zoro, sanji, luffy]
 
@@ -56,18 +56,17 @@ function Creation({ suite, setSuite }) {
     return selected.join(' ')
   }
 
-  function handlesubmit(e) {
+  async function handlesubmit(e) {
+  e.preventDefault()
+  if (!ready) return
 
-    if (!ready) {
-      return
-    }
-    else {
-    e.preventDefault()
-    createUser(creation)
+  const success = await createUser(creation)
+
+  if (success) {
     setSuite(prev => prev + 1)
     setRendercond([])
-    }
   }
+}
 
   function resetall() {
     setCreation({})
