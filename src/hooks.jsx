@@ -81,15 +81,24 @@ export function useUser(initial = []) {
   }
 
   // Supprimer un utilisateur
-  function deleteUser() {
-    if (!actualuser) return
+ async function deleteUser() {
+  if (!actualuser) return
 
-    setTabuser(prev => prev.filter(u => u.key !== actualuser.key))
-    supabase.from('users').delete().eq('key', actualuser.key).catch(err =>
-      console.error('Erreur suppression utilisateur', err)
-    )
-    setActualuser(null)
+  setTabuser(prev => prev.filter(u => u.key !== actualuser.key))
+
+  const { error } = await supabase
+    .from('users')
+    .delete()
+    .eq('key', actualuser.key)
+
+  if (error) {
+    console.error('Erreur suppression utilisateur', error)
+  } else {
+    console.log('Utilisateur supprimé avec succès')
   }
+
+  setActualuser(null)
+}
 
   return {
     tabuser,
